@@ -1,6 +1,8 @@
-# Bvnk - Distributed
+# Bvnk - Distributed Banking
 
 This is an implementation for a global, distributed bank that still functions within the current banking ecosystem.
+
+----
 
 ## Overview
 The current internet, including financial institutions, has become too focused and prone to failure. In order to widen service reach, 
@@ -11,23 +13,23 @@ that is decentralized while realizing the necessity for some centralized functio
 financial system, centralization of some services is required.
 
 ## Central but decentralized
-Bvnk will be required to speak to territories central banks. This will involve effectively being licensed as a bank in that 
+__bvnk__ will be required to speak to territories central banks. This will involve effectively being licensed as a bank in that 
 territory. How can we manage a bank but still keep it free and open?
 
-- bvnk would be a non-profit
+- __bvnk__ would be a non-profit
 - GPL licensing
-- People who work for bvnk (staff, developers, hosting companies) will be paid from this pool
+- People who work for __bvnk__ (staff, developers, hosting companies) will be paid from this pool
 - Money will be used as collateral for regulations
 
-bvnk needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or 
+__bvnk__ needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or 
 weighted votes but explicitly limited. We could then all vote on what the sitting money is being used for, corporate governance and more. People could also issue loans to one another using this system.
 
 ## Structure
-bvnk will be distributed by nature, separated into nodes, clients and broadcasters. Each service will function in the system 
+__bvnk__ will be distributed by nature, separated into nodes, clients and broadcasters. Each service will function in the system 
 as as whole, providing specific functionality and adding to network resiliency. There can be N instances of each service.
 
 ### Nodes
-Bvnk will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
+__bvnk__ will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
 Answers from nodes will be derived from consensus, improving security and mitigating bad actors. Anyone can run a node.
 
 The distributed database will be a RethinkDB cluster. Nodes will report in when they are online, and do period health checks to make sure they are active. Each node should at all times have a full list of other nodes.
@@ -120,7 +122,7 @@ User's **must** have backups of keys. This can be done by backing them up using 
 ### Double spending
 
 Using threshold cryptography together with reaching a consensus we can require transactions to be verified by a large number of nodes (50%, 70%?). Each node would report back into the 
-originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pgp keys. This will not work if there 
+originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pub/pvt keys. This will not work if there 
 is bad connectivity, if the network is down, if a lot of the nodes are down but not updated, etc.
 
 ### Broadcasters
@@ -128,7 +130,14 @@ is bad connectivity, if the network is down, if a lot of the nodes are down but 
 Separate software that runs and sends transactions to all nodes. Only users use these. Excluding nodes from broadcasters might stop potential attacks.
 
 ### Data at rest
-__TODO__
+Broadly, data at rest will be encrypted using a combination of factors:
+
+- User's key
+- Bank's key
+- Shared secrets
+- Unique user information (password or similar)
+
+The implementation of this is still to be worked out.
 
 ### User data
 This includes user account details, balances, etc.
@@ -136,4 +145,6 @@ This includes user account details, balances, etc.
 A user's data must not be able to be changed unless both the bank and the user agree to it. As such the data must be encrypted by both parties.
 
 ## Conclusion
-This is a high level run through for a distribured banking system. If you would like to contribute, please open a pull request.
+This is a high level run through for a distribured banking system. 
+
+If you would like to contribute to this document, please open [a pull request](https://github.com/bvnk/bank-distributed).

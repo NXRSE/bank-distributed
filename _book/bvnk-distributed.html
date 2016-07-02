@@ -158,8 +158,9 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="bvnk---distributed">Bvnk - Distributed</h1>
+                                <h1 id="bvnk---distributed-banking">Bvnk - Distributed Banking</h1>
 <p>This is an implementation for a global, distributed bank that still functions within the current banking ecosystem.</p>
+<hr>
 <h2 id="overview">Overview</h2>
 <p>The current internet, including financial institutions, has become too focused and prone to failure. In order to widen service reach, 
 provide goals in line with the original ethos of the internet, and provide superior service platforms can be made to be distributed.</p>
@@ -167,21 +168,21 @@ provide goals in line with the original ethos of the internet, and provide super
 that is decentralized while realizing the necessity for some centralized functionality. In order to operate within the current 
 financial system, centralization of some services is required.</p>
 <h2 id="central-but-decentralized">Central but decentralized</h2>
-<p>Bvnk will be required to speak to territories central banks. This will involve effectively being licensed as a bank in that 
+<p><strong>bvnk</strong> will be required to speak to territories central banks. This will involve effectively being licensed as a bank in that 
 territory. How can we manage a bank but still keep it free and open?</p>
 <ul>
-<li>bvnk would be a non-profit</li>
+<li><strong>bvnk</strong> would be a non-profit</li>
 <li>GPL licensing</li>
-<li>People who work for bvnk (staff, developers, hosting companies) will be paid from this pool</li>
+<li>People who work for <strong>bvnk</strong> (staff, developers, hosting companies) will be paid from this pool</li>
 <li>Money will be used as collateral for regulations</li>
 </ul>
-<p>bvnk needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or 
+<p><strong>bvnk</strong> needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or 
 weighted votes but explicitly limited. We could then all vote on what the sitting money is being used for, corporate governance and more. People could also issue loans to one another using this system.</p>
 <h2 id="structure">Structure</h2>
-<p>bvnk will be distributed by nature, separated into nodes, clients and broadcasters. Each service will function in the system 
+<p><strong>bvnk</strong> will be distributed by nature, separated into nodes, clients and broadcasters. Each service will function in the system 
 as as whole, providing specific functionality and adding to network resiliency. There can be N instances of each service.</p>
 <h3 id="nodes">Nodes</h3>
-<p>Bvnk will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
+<p><strong>bvnk</strong> will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
 Answers from nodes will be derived from consensus, improving security and mitigating bad actors. Anyone can run a node.</p>
 <p>The distributed database will be a RethinkDB cluster. Nodes will report in when they are online, and do period health checks to make sure they are active. Each node should at all times have a full list of other nodes.
 Applications who need endpoints (mobile, web, etc) will need to hold a list of nodes too, perhaps this can be restricted to the closest X nodes in a system. Using latency and other checks the best one can be chosen.</p>
@@ -270,17 +271,25 @@ Applications who need endpoints (mobile, web, etc) will need to hold a list of n
 <p>User&apos;s <strong>must</strong> have backups of keys. This can be done by backing them up using an easy to remember password with additional security measures. The point is that their key must be recoverable, easily for the account owner but difficult for a bad actor. This could perhaps be sent to a safe hold for the &quot;bvnk.org&quot; organization.</p>
 <h3 id="double-spending">Double spending</h3>
 <p>Using threshold cryptography together with reaching a consensus we can require transactions to be verified by a large number of nodes (50%, 70%?). Each node would report back into the 
-originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pgp keys. This will not work if there 
+originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pub/pvt keys. This will not work if there 
 is bad connectivity, if the network is down, if a lot of the nodes are down but not updated, etc.</p>
 <h3 id="broadcasters">Broadcasters</h3>
 <p>Separate software that runs and sends transactions to all nodes. Only users use these. Excluding nodes from broadcasters might stop potential attacks.</p>
 <h3 id="data-at-rest">Data at rest</h3>
-<p><strong>TODO</strong></p>
+<p>Broadly, data at rest will be encrypted using a combination of factors:</p>
+<ul>
+<li>User&apos;s key</li>
+<li>Bank&apos;s key</li>
+<li>Shared secrets</li>
+<li>Unique user information (password or similar)</li>
+</ul>
+<p>The implementation of this is still to be worked out.</p>
 <h3 id="user-data">User data</h3>
 <p>This includes user account details, balances, etc.</p>
 <p>A user&apos;s data must not be able to be changed unless both the bank and the user agree to it. As such the data must be encrypted by both parties.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>This is a high level run through for a distribured banking system. If you would like to contribute, please open a pull request.</p>
+<p>This is a high level run through for a distribured banking system. </p>
+<p>If you would like to contribute to this document, please open <a href="https://github.com/bvnk/bank-distributed" target="_blank">a pull request</a>.</p>
 
                                 
                                 </section>
@@ -320,7 +329,7 @@ is bad connectivity, if the network is down, if a lot of the nodes are down but 
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Explanation","level":"1.2","depth":1,"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"bvnk-distributed.md","mtime":"2016-07-02T08:53:35.000Z","type":"markdown"},"gitbook":{"version":"3.1.1","time":"2016-07-02T08:46:14.689Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Explanation","level":"1.2","depth":1,"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"bvnk-distributed.md","mtime":"2016-07-02T09:05:57.000Z","type":"markdown"},"gitbook":{"version":"3.1.1","time":"2016-07-02T08:46:14.689Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
