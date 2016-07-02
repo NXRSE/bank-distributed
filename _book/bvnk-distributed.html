@@ -160,133 +160,38 @@
                                 
                                 <h1 id="bvnk---distributed">Bvnk - Distributed</h1>
 <p>This is an implementation for a global, distributed bank that still functions within the current banking ecosystem.</p>
-<h2 id="nodes">Nodes</h2>
-<p>Bvnk will operate nodes. All nodes will contain source code and full copy of the distributed db.</p>
-<p>The distributed database will be a RethinkDB cluster. Nodes will report in when they are online, and do period health checks to make sure they are active. Each node should at all times have a full list of other nodes.</p>
-<p>Applications who need endpoints (mobile, web, etc) will need to hold a list of nodes too, perhaps this can be restricted to the closest X nodes in a system. Using latency and other checks the best one can be chosen.   </p>
-<h2 id="flow">Flow</h2>
-<ul>
-<li>User registers account using cell phone</li>
-<li>pgp Pub/pvt keys are generated which are linked to the account</li>
-<li>pgp keys sign and encrypt all transactions</li>
-<li>user makes payment:<ul>
-<li>encrypts transaction with recipient key and bank key (maybe sign with bank key would be a better way to put it) </li>
-<li>sends to nearest node</li>
-<li>bank node verifies keys </li>
-<li>finds recipient account</li>
-<li>sends transaction to recipient</li>
-<li>recipient downloads transaction</li>
-<li>recipient verifies transaction</li>
-<li>recipient sends verification using sender&apos;s key and bank key</li>
-<li>bank node verifies transaction</li>
-</ul>
-</li>
-</ul>
-<p>This is where it now gets a little tricky. In order to process the transaction, and assuming we are hooking into the already existing financial infrastructure, we need to take the money from the sender&apos;s bank and add it to the recipient&apos;s bank.</p>
-<p>As these accounts are in the distributed database, the only place through which money is transferred is the respective central banks.</p>
-<ul>
-<li>Bank nodes have both approved transaction</li>
-<li>Transactions are put forward for the central banks, one for sender and recipient each (in their respective territories)</li>
-<li>Transactions <strong>must</strong> be verified to be from the sender (signed by their key? encrypted fully?)</li>
-<li>Either in real time or in batches the transactions are processed</li>
-<li>Regulations are handled at the edge</li>
-</ul>
-<p>This would entail the software being trusted by the central bank, as well as the software being allowed to make transactions against the central bank.</p>
-<h3 id="verifiability">Verifiability</h3>
-<p>The issue comes in when there are now distributed nodes running by anyone who wishes to run them, how do you keep the system secure? It&apos;s a decentralized design with necessary centralized issues.</p>
-<p>Transactions can be verified by sending the transaction encrypted with the bank&apos;s private key. Some more detail on this in the Considerations section.</p>
-<p>There must be another way to do this cryptographically. To make sure that the node sending the transaction is trusted and sending trusted transactions.</p>
-<ul>
-<li>Perhaps the transaction can be sent along with all the keys of the transaction and verified at the edge: sender, recipient, bank. An attacker would then need to have all three keys to forge an attack. They can have one of them - the bank&apos;s - but not the other two.</li>
-<li>In the above scenario would the bank&apos;s key even be needed? Would it be needed for the initial payment flow, and not this flow?</li>
-</ul>
-<h2 id="how-will-this-system-make-money">How will this system make money?</h2>
-<p>In short, transaction fees. Each node will also be paid a nominal amount for processing and staying active, but money will be made on transaction fees.</p>
-<p>This money will be used for funding the system:</p>
-<ul>
-<li>infrastructure</li>
-<li>support</li>
-<li>help desks</li>
-<li>legal</li>
-<li>regulations</li>
-</ul>
+<h2 id="overview">Overview</h2>
+<p>The current internet, including financial institutions, has become too focused and prone to failure. In order to widen service reach, 
+provide goals in line with the original ethos of the internet, and provide superior service platforms can be made to be distributed.</p>
+<p>In this paper, we analyse an idea for a global, distributed banking system <strong>bvnk</strong> which is resilient, secure and equitable. We try to take a line 
+that is decentralized while realizing the necessity for some centralized functionality. In order to operate within the current 
+financial system, centralization of some services is required.</p>
 <h2 id="central-but-decentralized">Central but decentralized</h2>
-<p>Each territory will have to be cleared for operation on the bank. How can we manage a bank but still keep it free and open?</p>
+<p>Bvnk will be required to speak to territories central banks. This will involve effectively being licensed as a bank in that 
+territory. How can we manage a bank but still keep it free and open?</p>
 <ul>
+<li>bvnk would be a non-profit</li>
 <li>GPL licensing</li>
-<li>The bank would be a non-profit</li>
-<li>People who work for the bank (staff, developers, hosting companies) will be paid from this pool</li>
+<li>People who work for bvnk (staff, developers, hosting companies) will be paid from this pool</li>
 <li>Money will be used as collateral for regulations</li>
 </ul>
-<p>The bank needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or weighted votes but explicitly limited. We could then all vote on what the sitting money is being used for, corporate governance type stuff, and more. People could also issue loans to one another using this system.</p>
-<h2 id="considerations">Considerations</h2>
-<p>All deployments will have the bank private key so effectively all communications secured by the bank and the device are insecure. This is only when communication is encrypted with the bank&apos;s private key - any requests going <strong>into</strong> the bank. To mitigate this attack, all requests should be double verified (req -&gt; resp -&gt; ack -&gt; ack -&gt; transaction).</p>
-<p>The main bank holder will be an account separate. This is where all fees will be paid into, as well as final say on account opening, verification, bank loans, etc.</p>
+<p>bvnk needs to be open to participation from anyone. Anyone who has an account with the bank would have one vote. We can give people closer (developers, managers) some extra or 
+weighted votes but explicitly limited. We could then all vote on what the sitting money is being used for, corporate governance and more. People could also issue loans to one another using this system.</p>
+<h2 id="structure">Structure</h2>
+<p>bvnk will be distributed by nature, separated into nodes, clients and broadcasters. Each service will function in the system 
+as as whole, providing specific functionality and adding to network resiliency. There can be N instances of each service.</p>
+<h3 id="nodes">Nodes</h3>
+<p>Bvnk will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
+Answers from nodes will be derived from consensus, improving security and mitigating bad actors. Anyone can run a node.</p>
+<p>The distributed database will be a RethinkDB cluster. Nodes will report in when they are online, and do period health checks to make sure they are active. Each node should at all times have a full list of other nodes.
+Applications who need endpoints (mobile, web, etc) will need to hold a list of nodes too, perhaps this can be restricted to the closest X nodes in a system. Using latency and other checks the best one can be chosen.</p>
+<h3 id="threshold-cryptography">Threshold Cryptography</h3>
+<p>Resources:</p>
 <ul>
-<li>Could a bad actor bank node send false requests?</li>
-</ul>
-<p>User account data must be protected using multi sig. Something like:</p>
-<ul>
-<li>User opens account</li>
-<li>Account data is encrypted with bank key and user key (multi sig)</li>
-</ul>
-<p>Then:</p>
-<ul>
-<li>User requests to send money</li>
-<li>Bank gets the data</li>
-<li>Bank generates UUID OTP</li>
-<li>Bank sends partially encrypted data to user with OTP encrypted </li>
-<li>User decrypts it partially with OTP and their pvt key</li>
-<li>User sends back to bank encrypted with OTP (at this stage it is only encrypted with bank&apos;s key)</li>
-<li>Bank decrypts data, verifies account balance etc<ul>
-<li>This could be a problem. If there is a bad node it can just <em>say</em> the transaction is valid. </li>
-<li>For e.g. I try to transfer 1,000 from my account, I do the above check, the bank sees the balance of 100 but <em>chooses to ignore it</em>, approves the transaction and then fraud is committed. </li>
-<li>Worse, this new, false balance will then be propogated throughout the system.</li>
-<li>I am sure Bitcoin has fixed this problem.</li>
-<li>This might be solved by sending a snippet of a transaction to many banks, them checking the balance and confirming (more in section Double Spending)</li>
-</ul>
-</li>
-</ul>
-<p>The above flow is done for all transaction requests. Then the transaction is sent to the central bank. Maybe each central bank has it&apos;s own set of keys:</p>
-<ul>
-<li>Transaction gets verified as above</li>
-<li>Bank node repsonds with the appropriate central bank key (the central bank belonging to their account, probably geographically based)</li>
-<li>User then encrypts transaction with central bank key, bank key, their key</li>
-<li>Maybe the bank verifies the transaction (looking up the amount etc, mentioned below) creates the transaction using the central bank&apos;s key and has the user sign the transaction. This way the transaction is encrypted for the bank, with the user&apos;s approval on each.</li>
-</ul>
-<h3 id="keys-and-accounts">Keys and accounts</h3>
-<p>User&apos;s <strong>must</strong> have backups of keys. This can be done by backing them up using an easy to remember password with additional security measures. The point is that their key must be recoverable, easily for the account owner but difficult for a bad actor. This could perhaps be sent to a safe hold for the &quot;bvnk.org&quot; organization.</p>
-<h3 id="double-spending">Double spending</h3>
-<p>In theory, a user could get a list of all bank nodes, write a script that goes through them, and send transactions very quickly. This will result in the transactions being processed by each bank node before the bank node has had a chance to update from the initial request. This is where the blockchain confirmations can come in. We could also somehow couple this with a merkle tree to make sure that the oldest transaction is the oldest. This will be a problem when we are dealing with thousands of transactions per second. </p>
-<p>Perhaps transactions could be verified by a large number of nodes (50%, 70%?) ensuring that the above cannot happen. Each node would report back into the originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pgp keys. This will not work if there is bad connectivity, if the network is down, if a lot of the nodes are down but not updated, etc. This idea seems best so far.</p>
-<p>Transaction flow with considerations for double spending and balance verifiability.</p>
-<ul>
-<li>User requests to send transaction with a value</li>
-<li>Node responds with a challenge. This challenge includes the user&apos;s data, encrypted from bank to user (plain text -&gt; [ bank -&gt; user ]).</li>
-<li>Node sends challenge with user&apos;s pubkey to all other nodes</li>
-<li>User responds to challenge, confirming legitimacy. Here the user decrypts the data so that it is now only encrypted with the bank&apos;s key/secret and a challenge ([ plain text -&gt; bank ]+Challenge -&gt; user)</li>
-<li>User sends response to broadcaster (which sends to all nodes on behalf of user)</li>
-<li>Nodes decrypt user account data fully</li>
-<li>Nodes verify the transaction</li>
-<li>When a critical point is reached (50%? 70%? More?) the transaction is approved (this is similar to confirmations in the blockchain)</li>
-<li>Once verified, account balance is updated, encrypted, sent to user who signs it, and transaction is settled<ul>
-<li>This needs a lot more thought.</li>
-</ul>
-</li>
-</ul>
-<h3 id="broadcasters">Broadcasters</h3>
-<p>Separate software that runs and sends transactions to all nodes. Only users use these. Excluding nodes from broadcasters might stop potential attacks.</p>
-<h3 id="data-at-rest">Data at rest</h3>
-<p>Data at rest is encrypted as follows.</p>
-<h4 id="user-data">User data</h4>
-<p>This includes user account details, balances, etc.</p>
-<p>A user&apos;s data must not be able to be changed unless both the bank and the user agree to it. As such the data must be encrypted by both parties.</p>
-<h2 id="reworked-using-threshold-cryptography">Reworked using Threshold Cryptography</h2>
-<ul>
-<li><a href="https://en.wikipedia.org/wiki/Threshold_cryptosystem" target="_blank">Threshold cryptosystem</a> looks like a good fit. </li>
+<li><a href="https://en.wikipedia.org/wiki/Threshold_cryptosystem" target="_blank">Threshold cryptosystem</a>. </li>
 <li><a href="http://www.cs.cornell.edu/Courses/cs513/2000SP/SecretSharingCA.html" target="_blank">Secret sharing CA</a></li>
 <li><a href="http://groups.csail.mit.edu/cis/cis-threshold.html" target="_blank">More reading on Threshold Cryptography</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Distributed_key_generation" target="_blank">Distributed key generation</a> might come in handy.</li>
+<li><a href="https://en.wikipedia.org/wiki/Distributed_key_generation" target="_blank">Distributed key generation</a>.</li>
 </ul>
 <p>Description of flow.</p>
 <ul>
@@ -296,6 +201,86 @@
 <li>The account data is then decrypted, compared with the request which is bundled in the data, and verified or declined</li>
 <li>The entire above process is done X number of times, reaching required consensus over the network</li>
 </ul>
+<h3 id="example">Example</h3>
+<ul>
+<li>User registers account using cell phone</li>
+<li>pub/pvt keys are generated which are linked to the account</li>
+<li>pub/pvt keys sign and encrypt all transactions</li>
+<li>user makes payment:<ul>
+<li>user sends payment request to node</li>
+<li>node fetches user&apos;s account data</li>
+<li>node generates request UUID</li>
+<li>node sends data to user (fully encrypted) with additional UUID encryption</li>
+<li>user partially decrypts data using pvt key and UUID</li>
+<li>user appends request to data</li>
+<li>user sends data back to node, re-encrypting using UUID</li>
+<li>node partially decrypts using UUID</li>
+<li>node sends transaction to other nodes in order to decrypt remaining data<ul>
+<li>No one node has the bvnk pvt key</li>
+</ul>
+</li>
+<li>once pvt key constructed, account data is decrypted</li>
+<li>account data compared to request data</li>
+<li>nodes approve/deny transaction</li>
+<li>above is repeated until N nodes have approved transaction</li>
+<li>once transaction approved, request is now constructed for the central bank</li>
+<li>transaction is constructed for the central bank</li>
+<li>transaction is sent to user (encrypted bvnk -&gt; user)</li>
+<li>user decrypts, verifies transaction, signs transcation with pvt key</li>
+<li>user encrypts data and sends to node (encrypted user -&gt; bvnk)</li>
+<li>bvnk decrypts request, sends request to central bank with user&apos;s signing<ul>
+<li>Details for bvnk request to central bank being authorized by the user to be ironed out</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>This would entail the software being trusted by the central bank, as well as the software being allowed to make transactions against the central bank.</p>
+<h3 id="verifiability">Verifiability</h3>
+<p>The issue comes in when there are now distributed nodes running by anyone who wishes to run them, how do you keep the system secure? It&apos;s a decentralized design with necessary centralized issues.</p>
+<p>Transactions can be verified by sending the transaction encrypted with the bank&apos;s private key. The system needs too make sure that the node sending the transaction is trusted and sending trusted transactions.</p>
+<ul>
+<li>Perhaps the transaction can be sent along with all the keys of the transaction and verified at the edge: sender, recipient, bank. An attacker would then need to have all three keys to forge an attack. They can have one of them - the bank&apos;s - but not the other two.</li>
+<li>The bank&apos;s key being used in the transaction would act as a proof of consensus on the network. For the transaction to be signed by the bank&apos;s key it would have to have been approved by N nodes.</li>
+</ul>
+<h2 id="how-will-this-system-make-money">How will this system make money?</h2>
+<p>The system will primarily make money through transaction fees. Each node will also be paid a nominal amount for processing and staying active.</p>
+<p>This money will be used for funding the system:</p>
+<ul>
+<li>development</li>
+<li>infrastructure</li>
+<li>support</li>
+<li>help desks</li>
+<li>legal</li>
+<li>regulations</li>
+</ul>
+<p>The main bank holder will be an account separate. This is where all fees will be paid into, as well as final say on account opening, verification, bank loans, etc.</p>
+<h2 id="considerations">Considerations</h2>
+<p>All deployments will have a partial of the bank private key. Using threshold cryptography we can help ensure that no one bad actor has or can recreate the private key. Ideally we should treat all communications secured by the bank and the device as insecure. This is only when communication is encrypted with the bank&apos;s private key - any requests going <strong>into</strong> the bank. To mitigate this attack, all requests should be double verified (req -&gt; resp -&gt; ack -&gt; ack -&gt; transaction).</p>
+<ul>
+<li>Could a bad actor bank node send false requests?</li>
+<li>Could a bad actor save the re-constructed private key at time of decryption?</li>
+<li>User account data must be protected using multi sig. Something like:<ul>
+<li>User opens account</li>
+<li>Account data is encrypted with bank key and user key (multi sig)</li>
+</ul>
+</li>
+</ul>
+<h3 id="keys-and-accounts">Keys and accounts</h3>
+<p>User&apos;s <strong>must</strong> have backups of keys. This can be done by backing them up using an easy to remember password with additional security measures. The point is that their key must be recoverable, easily for the account owner but difficult for a bad actor. This could perhaps be sent to a safe hold for the &quot;bvnk.org&quot; organization.</p>
+<h3 id="double-spending">Double spending</h3>
+<p>Using threshold cryptography together with reaching a consensus we can require transactions to be verified by a large number of nodes (50%, 70%?). Each node would report back into the 
+originating node although this might be susceptable to a bad actor attack where the node just says everything is ok. Each node could have their own pgp keys. This will not work if there 
+is bad connectivity, if the network is down, if a lot of the nodes are down but not updated, etc.</p>
+<h3 id="broadcasters">Broadcasters</h3>
+<p>Separate software that runs and sends transactions to all nodes. Only users use these. Excluding nodes from broadcasters might stop potential attacks.</p>
+<h3 id="data-at-rest">Data at rest</h3>
+<p><strong>TODO</strong></p>
+<h3 id="user-data">User data</h3>
+<p>This includes user account details, balances, etc.</p>
+<p>A user&apos;s data must not be able to be changed unless both the bank and the user agree to it. As such the data must be encrypted by both parties.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This is a high level run through for a distribured banking system. If you would like to contribute, please open a pull request.</p>
 
                                 
                                 </section>
@@ -335,7 +320,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Explanation","level":"1.2","depth":1,"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"bvnk-distributed.md","mtime":"2016-06-25T19:14:38.000Z","type":"markdown"},"gitbook":{"version":"3.1.1","time":"2016-06-26T12:29:03.155Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Explanation","level":"1.2","depth":1,"previous":{"title":"Introduction","level":"1.1","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"bvnk-distributed.md","mtime":"2016-07-02T08:53:35.000Z","type":"markdown"},"gitbook":{"version":"3.1.1","time":"2016-07-02T08:46:14.689Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

@@ -28,17 +28,18 @@ as as whole, providing specific functionality and adding to network resiliency. 
 
 ### Nodes
 Bvnk will operate nodes. All nodes will contain source code and a full copy of the distributed db. Each node will process transactions, taking requests from clients and giving them responses. 
-Answers from nodes will be derived from consensus, improving security and mitigating bad actors. Any one can run a node.
+Answers from nodes will be derived from consensus, improving security and mitigating bad actors. Anyone can run a node.
 
 The distributed database will be a RethinkDB cluster. Nodes will report in when they are online, and do period health checks to make sure they are active. Each node should at all times have a full list of other nodes.
 Applications who need endpoints (mobile, web, etc) will need to hold a list of nodes too, perhaps this can be restricted to the closest X nodes in a system. Using latency and other checks the best one can be chosen.
 
 ### Threshold Cryptography
+Resources:
 
-- [Threshold cryptosystem](https://en.wikipedia.org/wiki/Threshold_cryptosystem) looks like a good fit. 
+- [Threshold cryptosystem](https://en.wikipedia.org/wiki/Threshold_cryptosystem). 
 - [Secret sharing CA](http://www.cs.cornell.edu/Courses/cs513/2000SP/SecretSharingCA.html)
 - [More reading on Threshold Cryptography](http://groups.csail.mit.edu/cis/cis-threshold.html)
-- [Distributed key generation](https://en.wikipedia.org/wiki/Distributed_key_generation) might come in handy.
+- [Distributed key generation](https://en.wikipedia.org/wiki/Distributed_key_generation).
 
 Description of flow.
 
@@ -85,7 +86,7 @@ The issue comes in when there are now distributed nodes running by anyone who wi
 Transactions can be verified by sending the transaction encrypted with the bank's private key. The system needs too make sure that the node sending the transaction is trusted and sending trusted transactions.
 
 - Perhaps the transaction can be sent along with all the keys of the transaction and verified at the edge: sender, recipient, bank. An attacker would then need to have all three keys to forge an attack. They can have one of them - the bank's - but not the other two.
-- In the above scenario would the bank's key even be needed? Would it be needed for the initial payment flow, and not this flow?
+- The bank's key being used in the transaction would act as a proof of consensus on the network. For the transaction to be signed by the bank's key it would have to have been approved by N nodes.
 
 ## How will this system make money?
 
